@@ -57,7 +57,7 @@ def fetch_and_send_news():
         print("No new articles found.")
     else:
         today_str = datetime.now().strftime("%B %d, %Y")
-        message_text = f":newspaper: *Daily News Digest - {today_str}*\n\n" + "\n\n".join(all_news_items)
+        message_text = f":newspaper: *Hourly News Digest - {today_str}*\n\n" + "\n\n".join(all_news_items)
         print(f"Found {len(all_news_items)} sources with news.")
 
     # --- Send to Slack ---
