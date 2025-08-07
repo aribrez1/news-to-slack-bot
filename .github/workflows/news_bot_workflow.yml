@@ -3,7 +3,7 @@ name: Daily News Bot
 on:
   # Schedule to run every day at 13:00 UTC (which is 8 AM EST or 9 AM EDT)
   schedule:
-    - cron: '0 13 * * *'
+    - cron: '0 * * * *'
   # Allows you to run this workflow manually from the Actions tab for testing
   workflow_dispatch:
 
