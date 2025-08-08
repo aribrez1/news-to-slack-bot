@@ -28,13 +28,13 @@ SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 
 # --- Main Script ---
 def fetch_and_send_news():
-    """Fetches news from the last hour and sends it to Slack."""
+    """Fetches news from the last 24 hours and sends it to Slack."""
     if not SLACK_WEBHOOK_URL:
         print("Error: SLACK_WEBHOOK_URL not set.")
         return
 
-    # Set the time window for "new" articles to the last hour
-    one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
+    # Set the time window for "new" articles back to 24 hours
+    twenty_four_hours_ago = datetime.now(timezone.utc) - timedelta(hours=24)
     
     all_news_items = []
     
@@ -45,7 +45,7 @@ def fetch_and_send_news():
         for entry in feed.entries:
             # Parse publication date and make it timezone-aware
             published_time = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
-            if published_time >= one_hour_ago:
+            if published_time >= twenty_four_hours_ago:
                 news_for_source.append(f"• <{entry.link}|{entry.title}>")
         
         if news_for_source:
@@ -53,16 +53,17 @@ def fetch_and_send_news():
 
     # --- Prepare the Slack Message ---
     if not all_news_items:
-        # Don't post anything if there's no news to avoid channel spam
-        print("No new articles found in the last hour.")
-        return
+        # Reverted message for no news in 24 hours
+        message_text = ":zzz: No significant news found for your keywords in the last 24 hours."
+        print("No new articles found.")
     else:
-        # Updated message title for hourly digest
-        now_str = datetime.now().strftime("%B %d, %Y - %H:%M UTC")
-        message_text = f":newspaper: *Hourly News Digest - {now_str}*\n\n" + "\n\n".join(all_news_items)
+        # Reverted title for the daily digest
+        today_str = datetime.now().strftime("%B %d, %Y")
+        message_text = f":newspaper: *Daily News Digest - {today_str}*\n\n" + "\n\n".join(all_news_items)
         print(f"Found {len(all_news_items)} sources with news.")
 
     # --- Send to Slack ---
+    # This part sends the message whether news was found or not
     try:
         response = requests.post(
             SLACK_WEBHOOK_URL,
